@@ -31,7 +31,7 @@ namespace SerialNumber.Client
                     var thread1 = new Thread(new ThreadStart(Test1));
                     thread1.Start();
                     // 并发启动多线程
-                    var thread2 = new Thread(new ThreadStart(Test1));
+                    var thread2 = new Thread(new ThreadStart(Test2));
                     thread2.Start();
                 }
             }
@@ -57,11 +57,33 @@ namespace SerialNumber.Client
             {
                 for (int i = 0; i < num; i++)
                 {
-                    await DoClientWork(client);
+                    await DoClientWork(client, "测试示例-test");
                 }
             }
             ts.Stop();
             Console.WriteLine($"生成{num}个序号，耗时：{ts.ElapsedMilliseconds}");
+        }
+
+
+        private static void Test2()
+        {
+            RunTest2().ConfigureAwait(false);
+        }
+
+        private static async Task RunTest2()
+        {
+            var num = 10_000;
+            var ts = new Stopwatch();
+            ts.Start();
+            using (var client = await StartClientWithRetries())
+            {
+                for (int i = 0; i < num; i++)
+                {
+                    await DoClientWork(client, "测试示例-test2");
+                }
+            }
+            ts.Stop();
+            Console.WriteLine($"test2生成{num}个序号，耗时：{ts.ElapsedMilliseconds}");
         }
 
         private static async Task<IClusterClient> StartClientWithRetries()
@@ -100,10 +122,10 @@ namespace SerialNumber.Client
             return true;
         }
 
-        private static async Task DoClientWork(IClusterClient client)
+        private static async Task DoClientWork(IClusterClient client, string primaryKey)
         {
             // example of calling grains from the initialized client
-            var serialNumberService = client.GetGrain<SerialNumber.Interfaces.ISerialNumberService>("测试示例-test");
+            var serialNumberService = client.GetGrain<SerialNumber.Interfaces.ISerialNumberService>(primaryKey);
             var response = await serialNumberService.GetSerialNumber();
             Console.WriteLine(response);
         }

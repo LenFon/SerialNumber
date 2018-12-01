@@ -48,7 +48,7 @@ namespace SerialNumber.SiloHost
                 })
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SerialNumber.Grains.SerialNumberService).Assembly).WithReferences())
-                .ConfigureLogging(logging => logging.AddConsole())
+                //.ConfigureLogging(logging => logging.AddConsole())
                 .AddEfGrainStorage<SerialNumberDbContext>("ef")
                 .ConfigureServices(services =>
                 {
